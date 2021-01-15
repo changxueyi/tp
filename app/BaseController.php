@@ -93,6 +93,7 @@ abstract class BaseController
     }
 
     //健壮系统服务，杜绝无效请求，
+    //当我们去请求一个不存在的方法，或者不存在的控制器的时候，会去执行此call方法
     public function __call($name, $arguments)
     {
         //具体解释
@@ -118,7 +119,7 @@ abstract class BaseController
 
         //这里的status是业务中的状态,前端和后端一起来定义的，这个时候我们会面临到一个问题
         // 后端需要给前端一个状态,把状态码抽离，剥离出来
-        return show(0, "找不到该($name)方法", null, 405);
+        return show(config("status.action_not_found"), "找不到该($name)方法", null, 405);
 
     }
 

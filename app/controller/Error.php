@@ -7,7 +7,8 @@ class Error
     public function __call($name, $arguments)
     {
         $result = [
-            'status' => 0,
+            //注意：因为引用的是status.php文件，所以，调用的时候，一定要加上前缀status
+            'status' => config("status.controller_not_found"),
             'message' => "控制器不存在",
             'result' => null,
         ];
