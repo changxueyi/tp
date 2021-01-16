@@ -433,8 +433,8 @@ class Data extends BaseController
 
 
         //由于模型类实现了ArrayAccess接口，所以可以当成数组使用。
-        /* $user = User::find(42);
-         echo $user["username"]."".$user["birthday"]."".$user["address"];
+         /*$user = User::find(42);
+         echo $user["username"]."".$user["birthday"]."".$user["address"];*/
          //访问http://127.0.0.1/data/model3  输出小二王2018-03-02 15:09:37北京金燕龙*/
 
 
