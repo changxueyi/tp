@@ -3,7 +3,13 @@
 namespace app\Controller;
 
 use app\BaseController;
+
+use app\model\Cxy_User;
+use app\model\Demo;
+use app\model\User;
+use app\Request;
 use http\Message\Body;
+use think\db\Where;
 use think\facade\Db;
 
 //TP 6 必须要加入facade，我们还可以通过容器的方式来获取数据,门面模式
@@ -295,9 +301,256 @@ class Data extends BaseController
         /***
          * 分页实现
          */
-        $result = Db::name("cxy_user")->where("sex", "男")->order('id', "desc")->paginate(3);
-        dump($result);
+        /* $result = Db::name("cxy_user")->where("sex", "男")->order('id', "desc")->paginate(3);
+         dump($result);*/
 
+        /**
+         * 时间查询
+         * whereTime方法提供了日期和时间字段的快捷查询，示例如下：
+         */
+        /*$result = Db::name("cxy_user")
+            ->whereTime("birthday", '>=', '1970-10-1')
+            -select();
+        dump($result);*/
+
+        /**
+         * 查询两个小时内的博客
+         */
+        /*$result = Db::name("blog")
+            ->whereTime("create_time", '-2 hours');
+        //查询某个时间的区间
+        Db::table('cxy_user')->whereBetweenTime("create_time", '2017-01-01', '2017-06-30')
+            ->select();
+
+        //查询不是2017年上半年注册的用户
+        Db::name("cxy_user")
+            ->whereNotBetweenTime("create_time", '2017-01-01', '2017-06-30')
+            ->select();
+
+        //查询某年
+        Db::name("cxy_user")
+            ->whereYear("create_time")
+            ->select();
+
+        //查询某月
+        Db::name("cxy_user")
+            ->whereMonth("create_time")
+            ->select();
+
+        //查询某周
+        Db::name("cxy_user")
+            ->whereWeek("create_time")
+            ->select();
+
+        //查询某天，查询某天注册的用户
+        Db::name("cxy_user")
+            ->whereDay("create_time")
+            ->select();*/
+
+        /***
+         * 分页,Page函数 page(第几页，一页多少数据）
+         */
+        /*  $result = Db::table('cxy_user')
+              ->order('id', "desc")
+              ->page(2, 2)
+              ->select();
+          dump($result);*/
+
+    }
+
+    /**
+     * 数据库排查方案 ,SQL SQL调试核心的方式方法
+     */
+
+    public function abc()
+    {
+        //第一种，输入SQL方式就是使用控制器的SQL 进行查看
+
+        //第二种查看数据未返回的方式方法
+        $result = Db::table("cxy_user")
+            ->where("id", 10)
+            ->find();
+        echo Db::getLastSql();
+        exit;
+        http://127.0.0.1/data/index
+        dump($result);
+    }
+
+    /**
+     * Db操作数据库的增加，修改，删除
+     */
+    public function demo()
+    {
+        $data = ["username" => "changxueyilalal", "sex" => "男"];
+        $result = Db::name("cxy_user")
+            ->insert($data);
+        echo Db::getLastSql();
+        dump($result);
+    }
+    /**
+     * 一般场景都是假删除，后来通过一个脚本去扫库，然后去处理，实际开发项目中是这样的
+     */
+
+    /**
+     * 通过模型去操作数据库
+     */
+    //调用Model ,http://127.0.0.1/data/model1
+    public function model1()
+    {
+        $result = User::find(45);
+        dump($result->toArray());//把对象转为数组
+    }
+
+    /***
+     *通过模型操作查询其他使用
+     */
+
+    public function model2()
+    {
+        $modelObj = new User();
+        $results = $modelObj
+            ->where("id", "49")
+            /*            ->limit(2)
+                        ->order("id", "desc")*/
+            ->select();
+
+        foreach ($results as $result) {
+            dump($result['content']);
+        }
+    }
+
+    /**
+     * 使用模型进行处理数据
+     */
+    public function model3()
+    {
+        //获取数据
+        //$user = User::find(41);
+        //echo $user->address;
+        //echo $user->username;
+        //echo $user->address."".$user->username;字符串输出
+        //http://127.0.0.1/data/model3 ,输出北京老王
+
+
+        //由于模型类实现了ArrayAccess接口，所以可以当成数组使用。
+        /* $user = User::find(42);
+         echo $user["username"]."".$user["birthday"]."".$user["address"];
+         //访问http://127.0.0.1/data/model3  输出小二王2018-03-02 15:09:37北京金燕龙*/
+
+
+        //模型赋值
+        /*$user = new User();
+        $user->username = "百度科技";
+        $user->address = "中关村";*/
+
+        //该方式赋值会自动执行模型的修改器，如果不希望执行修改器操作，可以使用
+        /*$data['username']='changxueyi';
+        $data['address']=100;
+        $user = new User($data);*/
+
+        //此处样额区分大小写
+        //如果不想区分大小写,可以使用
+
+
+        //添加一条数据
+        //第一种是实例化模型对象后赋值并保存：
+        /*      $user = new User;
+              $user->name ="changxuyi";
+              $user->email = "changxueyi@jd.com";
+              $user->save();*/
+
+        //也可以直接传入数据到save方法批量赋值：
+        //默认只会写入数据表已有的字段，如果你通过外部提交赋值给模型，并且希望指定某些字段写入，可以使用：
+        /*$user = new User;
+        //post数组中只有name 和email字段会写入
+        $user->allowField(['name','email'])->save($_POST);*/
+
+        //最佳的建议是模型数据赋值之前就进行数据过滤，例如：
+        /*    $user = new User;
+            //过滤POST 数组中的非数据表字段数据
+            $data = Request::only(['name','email']);*/
+        //$user->save($data);
+        //save方法返回的是写入的记录数
+
+        //replace()写入
+        //save 方法可以支持replace写入
+        /* $user = new User;
+         $user->username = "jisuanjikexueyujishu";
+         $user->address = "北京大兴区科创十一街";
+         $user->replace()->save();*/
+
+
+        //获取自增ID
+        //如果想要获取到新增的数据自增id，可以使用下面的方式
+        /*$user = new User;
+        $user->name = "changxueyi";
+        $user->save();
+        //获取自增ID
+        echo $user->id;*/
+
+        //不要在同一个实例里面多次新增数据，如果确实需要多次新增，可以使用后面的静态方法处理。
+
+        //批量增加数据
+        /*$user = new User;
+        $list = [
+            ["username"=>"1111",'address'=>"2222"],
+            ["username"=>"2222",'address'=>"33333"]
+        ];
+        $user->saveAll($list);*/
+        //saveAll方法新增数据返回的是包含新增模型（带自增ID）的数据集对象。
+
+
+        //静态方法
+        /* $user = User::create([
+             "username"=>"chang",
+             "address"=>"北京京东数字科技"
+         ]);
+         echo $user->username.''.$user->address.''.$user->id;*/
+        //http://127.0.0.1/data/model3 返回chang北京京东数字科技102
+        //和save方法不同的是，create方法返回的是当前模型的对象实例。
+    }
+
+    /**
+     * 利用模型进行更新的操作
+     *
+     */
+    public function model4()
+    {
+        /*//查找并更新
+        $user = User::find(102);
+        dump($user);
+        $user->username = "changxueyi";
+        $user->address = "洛阳市11";
+        $user->save();
+        //save方法成功返回true，并只有当before_update事件返回false的时候返回false，有错误则会抛出异常。*/
+
+
+        //对于复杂的查询条件，也可以使用查询构造器来查询数据并更新
+        $user = User::where('sex', "男")
+            ->where("username", "常学奕")
+            ->find();
+        $user->username = "李艳茹";
+        $user->sex = '女';
+        $user->address = "iliyanru@163.com";
+        $user->save();
+        //save方法更新数据，只会更新变化的数据，对于没有变化的数据是不会进行重新更新的。如果你需要强制更新数据，可以使用下面的方法：
+        echo Db::getLastSql();
+    }
+
+    /**
+     * 删除操作
+     *
+     */
+    public function model5()
+    {
+        // 删除当前模型
+        ////除模型数据，可以在查询后调用delete方法。
+     /*   $user = User::find(54);
+        $user = delete();*/
+        //delete方法返回布尔值
+
+        //根据主键查询
+        User::destroy(54);
     }
 
 }
