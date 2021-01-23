@@ -28,7 +28,14 @@ class Http extends Handle
         //自己定义的异常处理机制
         // 添加自定义异常处理机制,核心中的核心，太重要了,好好的抓住这个要点信息
         //return show(config("status.error"), $e->getMessage());
-        return show(config("status.error"), $e->getMessage(),[],$this->httpStatus);
+
+        //dump($e->getStatusCode());
+        if (method_exists($e, "getStatusCode")) {
+            $httpStatus = $e->getStatusCode();
+        } else {
+            $httpStatus = $this->httpStatus;
+        }
+        return show(config("status.error"), $e->getMessage(), [], $httpStatus);
     }
 
 }

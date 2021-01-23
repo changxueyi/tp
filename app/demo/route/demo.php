@@ -9,4 +9,4 @@ Route::rule("test", "demo/index/hello", "GET");
 
 //Route::rule("demo/test", "demo/index/hello", "GET");假定路由test前再加上一个test,我们就可以使用http://127.0.0.1/demo/demo/test 访问了
 
-
+Route::rule("detail", "detail/index","GET",)->middleware(\app\demo\middleware\Detail::class);

@@ -6,7 +6,9 @@ use app\BaseController;
 
 use app\model\Cxy_User;
 use app\model\Demo;
-use app\model\User;
+use app\common\model\mysql\User;
+use app\common\model\mysql\Category;
+
 use app\Request;
 use http\Message\Body;
 use think\db\Where;
@@ -433,9 +435,9 @@ class Data extends BaseController
 
 
         //由于模型类实现了ArrayAccess接口，所以可以当成数组使用。
-         /*$user = User::find(42);
-         echo $user["username"]."".$user["birthday"]."".$user["address"];*/
-         //访问http://127.0.0.1/data/model3  输出小二王2018-03-02 15:09:37北京金燕龙*/
+        /*$user = User::find(42);
+        echo $user["username"]."".$user["birthday"]."".$user["address"];*/
+        //访问http://127.0.0.1/data/model3  输出小二王2018-03-02 15:09:37北京金燕龙*/
 
 
         //模型赋值
@@ -545,12 +547,56 @@ class Data extends BaseController
     {
         // 删除当前模型
         ////除模型数据，可以在查询后调用delete方法。
-     /*   $user = User::find(54);
-        $user = delete();*/
+        /*   $user = User::find(54);
+           $user = delete();*/
         //delete方法返回布尔值
 
         //根据主键查询
         User::destroy(54);
+    }
+
+    /**
+     * 测试数据库拿出来的到底是什么样的数据信息
+     */
+    public function model6()
+    {
+        $result = User::find(45);
+        echo $result;
+        //{"id":45,"username":"传智播客","birthday":"2018-03-04 12:04:06","sex":"男","address":"北京金燕龙"}
+        echo "*******************";
+        // dump($result);
+        //echo "---------------------------------------";
+        $results = $result->toArray();
+        //echo $results;
+        //注意： 得到了一个重要的结论，
+        //1. echo 打印一个对象会通过json进行打印输出
+        //2. dump 会把整个对象的结构信息，数据类型，等都打印出来，
+        //3. 如果把数据库中的对象拿出来，转换为一个数组，这个时候，通过echo是不能打印出来的，可以通过dump打印出来，即
+        //^ array:5 [▼
+        //  "id" => 45
+        //  "username" => "传智播客"
+        //  "birthday" => "2018-03-04 12:04:06"
+        //  "sex" => "男"
+        //  "address" => "北京金燕龙"
+        //]
+        //4. 如果通过echo打印出：显示不到信息,Array{"status":0,"message":"Array to string conversion","result":[]}
+        echo($results);
+    }
+
+    /**
+     * 测试分类信息列表
+     */
+    public function model7()
+    {
+        $where = [
+            "pid" => "2"
+        ];
+        /* $order = [
+             "listorder" => "desc",
+             "id" => "desc"
+         ];*/
+        $result = Category::where($where)->select();
+        echo $result;
     }
 
 }
